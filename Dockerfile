@@ -12,15 +12,10 @@ LABEL company="dtec.pro" \
 
 RUN addgroup hovr && \
     adduser --home /var/hovr --ingroup hovr hovr && \
-
-WORKDIR /var/hovr
-
-COPY . .
- 
-RUN apt-get update && \
-    apt-get install -y vlc && \
     mkdir -p /hovr_data && \
     chown hovr:hovr /hovr_data && \
+    apt-get update && \
+    apt-get install -y vlc && \
     pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir 'django>=2.0' \
         djangorestframework \
@@ -28,6 +23,10 @@ RUN apt-get update && \
         psycopg2 psycopg2-binary \
         python-vlc
 
+WORKDIR /var/hovr
+
+COPY . .
+ 
 ENV DJANGO_SETTINGS_MODULE="config.settings" \
     DJANGO_AUTOMIGRATE="yes" \
     DJANGO_DBINIT="./example/dbinit.json" \
@@ -39,10 +38,10 @@ ENV DJANGO_SETTINGS_MODULE="config.settings" \
     DJANGO_CONFIG_DATABASES_default_PORT="5432" \
     DJANGO_CONFIG_STATIC__ROOT="/srv/django/public/static" 
 
-VOLUME [ "/hovr_data", "/var/hovr/public", "/var/hovr/data" ]
+VOLUME [ "/hovr_data" ]
 
 EXPOSE 8000
 
 ENTRYPOINT [ "/var/hovr/docker-entrypoint.sh" ]
 
-CMD python manage.py runserver 0:8000
+CMD [ "./manage.py", "runserver", "0:8000" ]

@@ -1,0 +1,18 @@
+version: '3.4'
+services:
+  pynvr:
+    build: .
+    image: pynvr:0.1
+    restart: always
+#    healthcheck:
+#      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+#      interval: 1m
+#      timeout: 10s
+#      retries: 3
+#      start_period: 20s
+    ports:
+      - "${DELUGE_IN_PORT}:56881"
+    volumes:
+      - ./nvr.json:/etc/nvr.json
+      - /data2/public/nvr:/var/pynvr/data
+    tmpfs: /tmp

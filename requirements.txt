@@ -1,0 +1,5 @@
+django>=2.0
+djangorestframework>=3.7
+psycopg2>=2.7
+psycopg2-binary>=2.7
+python-vlc

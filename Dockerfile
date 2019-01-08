@@ -21,7 +21,7 @@ RUN addgroup hovr && \
         djangorestframework \
         django-compressor \ 
         psycopg2 psycopg2-binary \
-        python-vlc
+        python-vlc requests
 
 WORKDIR /var/hovr
 

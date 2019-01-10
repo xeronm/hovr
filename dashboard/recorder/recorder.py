@@ -38,6 +38,10 @@ class Recorder(threading.Thread):
         self.stop_time = stop_time
         self.start()
 
+    @property
+    def id(self):
+        return self.ident
+
     def bind_recorder(self, date_time):
         self.record_path = os.path.join(settings.HOVR_RECORDING_PATH, self.camera.name, date_time.strftime('%Y%m%d'))
 
@@ -46,6 +50,7 @@ class Recorder(threading.Thread):
             'record_path': self.record_path,
             'camera_name': self.camera.name, 
             'camera_netloc': urlc.netloc,
+            'camera_address': self.camera.address,
             'user_name': self.camera.user_name, 
             'password': self.camera.password, 
             'date_time': date_time.strftime('%Y%m%d_%H%M%S'),
@@ -86,6 +91,7 @@ class RecorderVLC(Recorder):
     def main(self):
         player = self.newPlayer()
         player_prev = None
+        self.recorderVLC = player
         while not self._event_done.isSet():
             date_time = timezone.localtime()
             if self.stop_time and self.stop_time < date_time:
@@ -95,6 +101,7 @@ class RecorderVLC(Recorder):
                 player_prev = player
                 player = self.newPlayer()
             elif player_prev and self.piece_time > 2000:
+                self.recorderVLC = player
                 player_prev.stop()
                 player_prev.release()
 
@@ -106,11 +113,13 @@ class RecorderVLC(Recorder):
 class RecorderHTTPGet(Recorder):
 
     def main(self):
+        self.recorderHTTPGet = {}
         self.next_snapshot_time = None
         while not self._event_done.isSet():
             date_time = timezone.localtime()
             if not self.next_snapshot_time or self.next_snapshot_time < date_time:
                 self.next_snapshot_time = date_time + datetime.timedelta(seconds=self.profile.interval)
+                self.recorderHTTPGet['last_snapshot_time'] = date_time
                 self.bind_recorder(self.next_snapshot_time)
                 r = requests.get(self.record_url, auth=(self.camera.user_name, self.camera.password))
                 with open(self.record_filename, 'wb+') as f:
@@ -166,7 +175,7 @@ class RecorderManager():
                             self.recorders[reckey] = recorderRef
                         recorderRef.update_time = date_time
             # remove obsoleted recorders
-            for reckey, recorderRef in dict([(k, r) for k, r in self.recorders.items() if r.update_time is None or r.update_time < date_time]):
+            for reckey, recorderRef in list([(k, r) for k, r in self.recorders.items() if r.update_time is None or r.update_time < date_time]):
                 del self.recorders[reckey]
                 logger.warning('Stoping thread %d for camera "%s"', recorderRef.recorder.ident, recorderRef.camera.name)
                 recorderRef.recorder.stop()

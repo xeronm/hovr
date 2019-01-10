@@ -144,7 +144,8 @@ class Camera(abstract_models.ObjectIdentityNameMixin, abstract_models.ModelAudit
     recorder_profile = models.ForeignKey(
          'RecorderProfile', related_name='cameras', verbose_name=_("Recorder Profile"), on_delete=models.PROTECT)
     recorder_profile2 = models.ForeignKey(
-         'RecorderProfile', related_name='cameras2', verbose_name=_("Recorder Profile (secondary)"), on_delete=models.PROTECT)
+         'RecorderProfile', related_name='cameras2', verbose_name=_("Recorder Profile (secondary)"), on_delete=models.PROTECT,
+         null=True, blank=True)
 
     class Meta:
         app_label = 'inventory'

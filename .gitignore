@@ -1,4 +1,6 @@
 *.pyc
 *.log
 data/*
-#home/*
+home/*
+!home/readme.txt
+!data/readme.txt

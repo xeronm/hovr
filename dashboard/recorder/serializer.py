@@ -29,7 +29,7 @@ class RecorderSerializer(serializers.Serializer):
     #profile = serializers.PrimaryKeyRelatedField(queryset=RecorderProfile.objects.all())
 
 class RecordingCameraSerializer(serializers.Serializer):
-#    url = serializers.HyperlinkedIdentityField(lookup_field='id', lookup_url_kwarg='pk', read_only=True, view_name='recording-camera-detail')
+    url = serializers.HyperlinkedIdentityField(lookup_field='id', lookup_url_kwarg='pk', read_only=True, view_name='recording-camera-detail')
     camera = serializers.HyperlinkedRelatedField(read_only=True, view_name='camera-detail')
     recorders = RecorderSerializer(read_only=True, many=True)
 

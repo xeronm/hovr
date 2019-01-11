@@ -80,7 +80,7 @@ class RecorderVLC(Recorder):
         self.bind_recorder(self.piece_start_time)
 
         args = list([a.render(**self.context) for a in self.profile.arguments.all()])
-        logger.info('player new piece "%s": %s %s', self.camera.name, self.record_url, args)
+        #logger.info('player new piece "%s": %s %s', self.camera.name, self.record_url, args)
 
         i = vlc.Instance()
         mp = i.media_new(self.record_url, *args).player_new_from_media()
@@ -141,6 +141,12 @@ class RecorderRef():
         self.update_time = None
 
 
+class RecordingCamera():
+    def __init__(self, camera):
+        self.camera = camera
+        self.id = camera.pk
+        self.recorders = []
+
 class RecorderManager():
 
     def __init__(self):
@@ -148,15 +154,15 @@ class RecorderManager():
         self.worker_thread = threading.Thread(target = self.workerMain)
         self._event_done = threading.Event()
 
-    def recordingCamera(self):
-        recording_camera = {}
+    def recordingCameras(self):
+        recording_cameras = {}
         for k, r in self.recorders.items():
-            item = recording_camera.get(k[0])
+            item = recording_cameras.get(k[0])
             if not item:
-                item = {'id': k[0], 'camera': r.recorder.camera, 'recorders': [] }
-                recording_camera[k[0]] = item
-            item['recorders'].append(r.recorder)
-        return recording_camera
+                item = RecordingCamera(r.recorder.camera)
+                recording_cameras[k[0]] = item
+            item.recorders.append(r.recorder)
+        return recording_cameras
 
     def workerMain(self):
         ScheduleIntervals = apps.get_model(app_label='inventory', model_name='ScheduleIntervals')

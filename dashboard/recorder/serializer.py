@@ -14,6 +14,7 @@ class RecorderHTTPGetSerializer(serializers.Serializer):
     last_snapshot_time = serializers.DateTimeField(read_only=True)
 
 class RecorderSerializer(serializers.Serializer):
+    url = serializers.HyperlinkedIdentityField(lookup_field='id', lookup_url_kwarg='pk', read_only=True, view_name='recorder-detail')
     id = serializers.IntegerField(read_only=True)
     start_time = serializers.DateTimeField(read_only=True)
     stop_time = serializers.DateTimeField(read_only=True)
@@ -26,5 +27,10 @@ class RecorderSerializer(serializers.Serializer):
     profile = serializers.HyperlinkedRelatedField(read_only=True, view_name='recorderprofile-detail')
     #profile = RecorderProfileSerializer(read_only=True) 
     #profile = serializers.PrimaryKeyRelatedField(queryset=RecorderProfile.objects.all())
+
+class RecordingCameraSerializer(serializers.Serializer):
+#    url = serializers.HyperlinkedIdentityField(lookup_field='id', lookup_url_kwarg='pk', read_only=True, view_name='recording-camera-detail')
+    camera = serializers.HyperlinkedRelatedField(read_only=True, view_name='camera-detail')
+    recorders = RecorderSerializer(read_only=True, many=True)
 
 #video_get_aspect_ratio

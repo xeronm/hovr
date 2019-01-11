@@ -20,6 +20,6 @@ from django.conf.urls import include, url
 urlpatterns = [
     path(r'admin/', admin.site.urls),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    path(r'inventory/', include('dashboard.inventory.urls')),
-    path(r'recorder/', include('dashboard.recorder.urls')),
+    path(r'api/inventory/', include('dashboard.inventory.urls')),
+    path(r'api/recorder/', include('dashboard.recorder.urls')),
 ]

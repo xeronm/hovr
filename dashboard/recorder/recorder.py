@@ -148,6 +148,16 @@ class RecorderManager():
         self.worker_thread = threading.Thread(target = self.workerMain)
         self._event_done = threading.Event()
 
+    def recordingCamera(self):
+        recording_camera = {}
+        for k, r in self.recorders.items():
+            item = recording_camera.get(k[0])
+            if not item:
+                item = {'id': k[0], 'camera': r.recorder.camera, 'recorders': [] }
+                recording_camera[k[0]] = item
+            item['recorders'].append(r.recorder)
+        return recording_camera
+
     def workerMain(self):
         ScheduleIntervals = apps.get_model(app_label='inventory', model_name='ScheduleIntervals')
         while not self._event_done.isSet():

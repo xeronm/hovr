@@ -31,7 +31,7 @@ class RecorderProfileSerializer(serializers.HyperlinkedModelSerializer):
     arguments = RecorderArgumentsSerializerInline(many=True)
     class Meta:
         model = models.RecorderProfile
-        fields = ('url', 'name', 'description', 'method', 'interval', 'filename_template', 'url_template', 'arguments')
+        fields = ('url', 'name', 'description', 'method', 'interval', 'recycle_timeout', 'filename_template', 'url_template', 'arguments')
 
 class CameraSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:

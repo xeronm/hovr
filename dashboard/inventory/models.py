@@ -35,6 +35,8 @@ class RecorderProfile(abstract_models.ObjectIdentityNameMixin, abstract_models.M
          help_text=_('Record filename template (django)') )
     url_template = models.CharField(verbose_name=_('URL template'), max_length=255,
          help_text=_('URL template (django)') )
+    recycle_timeout = models.PositiveSmallIntegerField(verbose_name=_('Record recycle timeout'), default=0,
+         help_text=_('Record recycle timeout (in days).'))
 
     class Meta:
         app_label = 'inventory'

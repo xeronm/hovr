@@ -19,14 +19,14 @@ class RecorderArgumentsInline(admin.TabularInline):
     extra = 1
 
 class RecorderProfileAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description', 'method', 'interval')
+    list_display = ('name', 'description', 'method', 'interval', 'recycle_timeout')
     inlines = [
         RecorderArgumentsInline,
     ]
     model = RecorderProfile
 
 class CameraAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description', 'address', 'schedule')
+    list_display = ('name', 'description', 'address', 'state', 'schedule')
     model = Camera
 
 admin.site.register(Camera, CameraAdmin)

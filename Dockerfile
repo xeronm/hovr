@@ -12,9 +12,9 @@ LABEL company="dtec.pro" \
 RUN addgroup hovr && \
     adduser --home /var/hovr --ingroup hovr hovr && \
     mkdir -p /hovr_data && \
-    mkdir -p /hovr_public && \
+    mkdir -p /hovr_public/static && \
     chown hovr:hovr /hovr_data && \
-    chown hovr:hovr /hovr_public && \
+    chown hovr:hovr -R /hovr_public && \
     apt-get update && \
     apt-get install -y vlc && \
     pip install --no-cache-dir --upgrade pip && \

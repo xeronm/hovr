@@ -2,3 +2,8 @@ Dockerfile*
 docker-compose.yml
 .git*
 *.pyc
+/data/*
+/home/*
+
+!/data/readme.txt
+!/home/readme.txt

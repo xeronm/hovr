@@ -20,7 +20,7 @@ services:
     ports:
       - "${HOVR_PORT}:8000"
     volumes:
-      - /data2/public/nvr:/hovr_data
+      - "${HOVR_DATA_PATH}:/hovr_data"
       - hovr_db:/var/hovr/data
     tmpfs: /tmp
 

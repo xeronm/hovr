@@ -1,0 +1,1 @@
+VLC home for docker container

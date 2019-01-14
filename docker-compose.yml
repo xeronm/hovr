@@ -1,18 +1,29 @@
 version: '3.4'
 services:
-  pynvr:
+  hovr:
     build: .
-    image: pynvr:0.1
+    image: hovr:0.1
     restart: always
-#    healthcheck:
-#      test: ["CMD", "curl", "-f", "http://localhost:8080"]
-#      interval: 1m
-#      timeout: 10s
-#      retries: 3
-#      start_period: 20s
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/admin/login"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    environment:
+      DJANGO_CONFIG_DATABASES_default_ENGINE: django.db.backends.sqlite3
+      DJANGO_CONFIG_DATABASES_default_NAME: /var/hovr/data/db.sqlite3
+      DJANGO_CONFIG_DATABASES_default_USER:
+      DJANGO_CONFIG_DATABASES_default_PASSWORD:
+      DJANGO_CONFIG_DATABASES_default_HOST:
+      DJANGO_CONFIG_DATABASES_default_PORT:
     ports:
-      - "${DELUGE_IN_PORT}:56881"
+      - "${HOVR_PORT}:8000"
     volumes:
-      - ./nvr.json:/etc/nvr.json
-      - /data2/public/nvr:/var/pynvr/data
+      - "${HOVR_DATA_PATH}:/hovr_data"
+      - hovr_db:/var/hovr/data
     tmpfs: /tmp
+
+
+volumes:
+  hovr_db:

@@ -1,5 +1,4 @@
 # MAKE: sudo docker build -t hovr:0.1 .
-#  vlc -vvv rtsp://nvruser:nvruser123456@192.168.6.10/Streaming/Channels/2 --sout="#file{dst=/hovr_data/1.mp4}" --no-sout-all --sout-keep --rtsp-tcp
 FROM python:3.6
 
 LABEL company="dtec.pro" \
@@ -13,7 +12,9 @@ LABEL company="dtec.pro" \
 RUN addgroup hovr && \
     adduser --home /var/hovr --ingroup hovr hovr && \
     mkdir -p /hovr_data && \
+    mkdir -p /hovr_public/static && \
     chown hovr:hovr /hovr_data && \
+    chown hovr:hovr -R /hovr_public && \
     apt-get update && \
     apt-get install -y vlc && \
     pip install --no-cache-dir --upgrade pip && \
@@ -21,7 +22,7 @@ RUN addgroup hovr && \
         djangorestframework \
         django-compressor \ 
         psycopg2 psycopg2-binary \
-        python-vlc
+        python-vlc requests
 
 WORKDIR /var/hovr
 
@@ -36,7 +37,7 @@ ENV DJANGO_SETTINGS_MODULE="config.settings" \
     DJANGO_CONFIG_DATABASES_default_PASSWORD="django" \
     DJANGO_CONFIG_DATABASES_default_HOST="db" \
     DJANGO_CONFIG_DATABASES_default_PORT="5432" \
-    DJANGO_CONFIG_STATIC__ROOT="/srv/django/public/static" 
+    DJANGO_CONFIG_STATIC__ROOT="/hovr_public/static" 
 
 VOLUME [ "/hovr_data" ]
 

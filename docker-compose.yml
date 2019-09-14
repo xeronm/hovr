@@ -2,7 +2,7 @@ version: '3.4'
 services:
   hovr:
     build: .
-    image: hovr:0.1
+    image: dtec.pro/hovr:0.2
     restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/admin/login"]

@@ -9,6 +9,7 @@ import time
 import datetime
 import requests
 import traceback
+import shutil
 from django.conf import settings
 from django.apps import apps
 from django.utils import timezone
@@ -27,6 +28,7 @@ def GetRecorder():
     return _recorder
 
 class Recorder(threading.Thread):
+    recycle_check_timeout_min = 10
 
     def __init__(self, camera, profile, stop_time, subpath):
         super().__init__(target=self.main)
@@ -39,6 +41,8 @@ class Recorder(threading.Thread):
         self.stop_time = stop_time
         self.subpath = subpath
         self.start()
+        self._next_recylce_check = None
+
 
     @property
     def id(self):
@@ -57,11 +61,16 @@ class Recorder(threading.Thread):
                 record_path = os.path.join(record_daypath, self.subpath)
                 if os.path.isdir(record_path):
                     logger.info('Recyle: %s', record_path)
-                    os.removedirs(record_path)
+                    shutil.rmtree(record_path, ignore_errors=True)
                 if not os.listdir(record_daypath):
                     os.rmdir(record_daypath)
             except Exception as E:
                 logger.error('Recorder:recycle Unhandled exception: %s', traceback.format_exc())
+
+    def checkRecycle(self, date_time):
+        if not self._next_recylce_check or date_time > self._next_recylce_check:
+            self._next_recylce_check = date_time + datetime.timedelta(minutes=self.recycle_check_timeout_min)
+            self.recycle(date_time)
 
 
     def bind_recorder(self, date_time):
@@ -114,7 +123,6 @@ class RecorderVLC(Recorder):
         player = self.newPlayer()
         player_prev = None
         self.recorderVLC = player
-        next_recylce_check = None
         try:
             while not self._event_done.isSet():
                 date_time = timezone.localtime()
@@ -129,10 +137,8 @@ class RecorderVLC(Recorder):
                     player_prev.stop()
                     player_prev.release()
     
+                self.checkRecycle(date_time)
                 time.sleep(THREAD_CHECK_TIMEOUT_SEC)
-                if not next_recylce_check or date_time > next_recylce_check:
-                    next_recylce_check = date_time + datetime.timedelta(minutes=10)
-                    self.recycle(date_time)
         finally:
             if player_prev:
                 player_prev.stop()
@@ -145,6 +151,8 @@ class RecorderHTTPGet(Recorder):
     def main(self):
         self.recorderHTTPGet = {}
         self.next_snapshot_time = None
+
+        next_recylce_check = None
         while not self._event_done.isSet():
             date_time = timezone.localtime()
             if not self.next_snapshot_time or self.next_snapshot_time < date_time:
@@ -159,6 +167,7 @@ class RecorderHTTPGet(Recorder):
                     logger.error('RecorderHTTPGet:main Exception: %s', str(E))
             if self.stop_time and self.stop_time < date_time:
                 break;
+            self.checkRecycle(date_time)
             time.sleep(THREAD_CHECK_TIMEOUT_SEC)
 
 
